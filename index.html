@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>0bfusk8r</title>
+		<style>
+			html,
+			body
+			{
+				padding:0px;
+				margin:0px;
+				height:100%;
+			}
+
+			#main
+			{
+				position:absolute;
+				top:30px;
+				bottom:0px;
+				left:0px;
+				right:0px;
+			}
+
+			#bar
+			{
+				position:absolute;
+				top:0px;
+				left:0px;
+				right:0px;
+				height:20px;
+				background-color:#000;
+				color:#fff;
+
+				font-family:monospace;
+
+				padding:5px;
+			}
+
+			#title
+			{
+				color:#fff;
+				font-weight:bold;
+				font-size:15px;
+			}
+
+			#version
+			{
+				color:#999;
+				margin-right:100px;
+			}
+
+			#input,
+			#output
+			{
+				border:none;
+				position:absolute;
+
+				top:0px;
+				bottom:0px;
+				left:0px;
+				right:0px;
+
+				width:100%;
+				height:100%;
+
+				padding:0px;
+				margin:0px;
+
+				background:none;
+
+				font-family:monospace;
+				font-size:13px;
+
+				white-space:pre-wrap;
+
+				resize:none;
+
+				overflow:scroll;
+			}
+
+			#threshold
+			{
+				font-family:monospace;
+				width:3em;
+				background-color:#000;
+				border:none;
+				color:#fff;
+				padding:3px;
+			}
+
+			#threshold:hover
+			{
+				background-color:#444;
+			}
+
+			.showing
+			{
+				color:rgba(0,0,0,1);
+			}
+
+			.hiding
+			{
+				color:rgba(0,0,0,0);
+			}
+		</style>
+
+		<script>
+
+			var clearChars = 20;
+			var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+			var pattern = /[a-z]/i;
+
+			var input;
+
+			function init ()
+			{
+				input = document.getElementById('input');
+				output = document.getElementById('output');
+				input.focus();
+			}
+
+			function obfuscate ()
+			{
+				var threshold = document.getElementById('threshold').value;
+
+				var clearBit = input.value.substring(input.value.length - threshold);
+				var obsBit = input.value.substring(0, input.value.length - threshold);
+
+				var existingObs = output.innerHTML;
+
+				var string = '';
+
+				for (var i in obsBit)
+				{
+					if (Math.random() * 100 < 80)
+					{
+						string = string + existingObs[i];
+						continue;
+					}
+
+					if (pattern.test(obsBit[i]))
+					{
+						string = string + chars.charAt(Math.floor(Math.random() * chars.length));
+					}
+					else
+					{
+						string = string + obsBit[i];
+					}
+				}
+
+				output.innerHTML = '';
+				output.appendChild(document.createTextNode(string + clearBit));
+
+				scrollAll();
+
+				return false;
+			}
+
+			document.onkeydown = function (e)
+			{
+				if (e.keyCode === 17)
+				{
+					input.className = 'showing';
+					output.className = 'hiding';
+				}
+			};
+
+			document.onkeyup = function (e)
+			{
+				if (e.keyCode === 17)
+				{
+					input.className = 'hiding';
+					output.className = 'showing';
+				}
+			};
+
+			function scrollAll ()
+			{
+				output.scrollTop = input.scrollTop;
+			}
+
+		</script>
+    </head>
+    <body onload="init();">
+		<div id="bar">
+			<span id="title">0bfusk8r</span>
+			<span id="version">v0.01&alpha; by Jared</span>
+			<span>Threshold:</span>
+			<input onchange="obfuscate()" id="threshold" type="number" value="20" step="5" min="0"/>
+		</div>
+		<div id="main">
+			<div class="showing" id="output"></div>
+			<textarea class="hiding" id="input" onkeyup="obfuscate()" onkeydown="obfuscate()" onscroll="scrollAll()"></textarea>
+		</div>
+    </body>
+</html>
