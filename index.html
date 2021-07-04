@@ -33,7 +33,7 @@
 
 				font-family:monospace;
 
-				padding:5px;
+				padding:5px 1em;
 			}
 
 			#title
@@ -52,6 +52,7 @@
 			#input,
 			#output
 			{
+				box-sizing: border-box;
 				border:none;
 				position:absolute;
 
@@ -63,7 +64,7 @@
 				width:100%;
 				height:100%;
 
-				padding:0px;
+				padding:1em;
 				margin:0px;
 
 				background:none;
@@ -75,7 +76,9 @@
 
 				resize:none;
 
-				overflow:scroll;
+				overflow:auto;
+
+				outline: none;
 			}
 
 			#threshold
@@ -103,94 +106,92 @@
 				color:rgba(0,0,0,0);
 			}
 		</style>
-
-		<script>
-
-			var clearChars = 20;
-			var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-			var pattern = /[a-z]/i;
-
-			var input;
-
-			function init ()
-			{
-				input = document.getElementById('input');
-				output = document.getElementById('output');
-				input.focus();
-			}
-
-			function obfuscate ()
-			{
-				var threshold = document.getElementById('threshold').value;
-
-				var clearBit = input.value.substring(input.value.length - threshold);
-				var obsBit = input.value.substring(0, input.value.length - threshold);
-
-				var existingObs = output.innerHTML;
-
-				var string = '';
-
-				for (var i in obsBit)
-				{
-					if (Math.random() * 100 < 80)
-					{
-						string = string + existingObs[i];
-						continue;
-					}
-
-					if (pattern.test(obsBit[i]))
-					{
-						string = string + chars.charAt(Math.floor(Math.random() * chars.length));
-					}
-					else
-					{
-						string = string + obsBit[i];
-					}
-				}
-
-				output.innerHTML = '';
-				output.appendChild(document.createTextNode(string + clearBit));
-
-				scrollAll();
-
-				return false;
-			}
-
-			document.onkeydown = function (e)
-			{
-				if (e.keyCode === 17)
-				{
-					input.className = 'showing';
-					output.className = 'hiding';
-				}
-			};
-
-			document.onkeyup = function (e)
-			{
-				if (e.keyCode === 17)
-				{
-					input.className = 'hiding';
-					output.className = 'showing';
-				}
-			};
-
-			function scrollAll ()
-			{
-				output.scrollTop = input.scrollTop;
-			}
-
-		</script>
     </head>
-    <body onload="init();">
+    <body>
 		<div id="bar">
 			<span id="title">0bfusk8r</span>
-			<span id="version">v0.01&alpha; by Jared</span>
+			<span id="version">v0.02&alpha; by Jared</span>
 			<span>Threshold:</span>
-			<input onchange="obfuscate()" id="threshold" type="number" value="20" step="5" min="0"/>
+			<input
+				onchange="obfuscate()"
+				id="threshold" type="number" value="20" step="5" min="0"/>
 		</div>
 		<div id="main">
 			<div class="showing" id="output"></div>
 			<textarea class="hiding" id="input" onkeyup="obfuscate()" onkeydown="obfuscate()" onscroll="scrollAll()"></textarea>
 		</div>
     </body>
+
+	<script>
+
+		const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		const pattern = /[a-z]/i;
+
+		const input = document.getElementById('input');
+		const output = document.getElementById('output');
+
+		function obfuscate ()
+		{
+			const threshold		= parseInt(document.getElementById('threshold').value);
+			const clearStart	= input.selectionEnd - threshold;
+			const clearEnd		= input.selectionEnd + threshold;
+			const currentOutput	= output.innerText;
+			const currentInput	= input.value;
+
+			const outputChars = [];
+
+			for (var i in currentInput)
+			{
+				if (i > clearStart && i < clearEnd) {
+					outputChars.push(currentInput[i]);
+
+				} else if (!pattern.test(currentInput[i])) {
+					outputChars.push(currentInput[i]);
+
+				} else if (Math.random() * 100 < 80) {
+					const nextChar = pattern.test(currentOutput[i])
+						? currentOutput[i]
+						: chars.charAt(Math.floor(Math.random() * chars.length));
+					outputChars.push(nextChar);
+
+				} else {
+					outputChars.push(chars.charAt(Math.floor(Math.random() * chars.length)));
+
+				}
+			}
+
+			output.innerHTML = '';
+			output.appendChild(document.createTextNode(outputChars.join('')));
+
+			scrollAll();
+
+			return false;
+		}
+
+		input.addEvent('onkeydown', e => {
+			if (e.keyCode === 17)
+			{
+				input.className = 'showing';
+				output.className = 'hiding';
+			}
+		});
+
+		input.addEventListener('keyup', e => {
+			if (e.keyCode === 17)
+			{
+				input.className = 'hiding';
+				output.className = 'showing';
+			}
+		});
+
+		input.addEventListener('click', e => {
+			obfuscate();
+		});
+
+		function scrollAll ()
+		{
+			output.scrollTop = input.scrollTop;
+		}
+
+	</script>
 </html>
