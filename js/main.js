@@ -40,7 +40,7 @@ function obfuscate() {
     return false;
 }
 
-input.addEvent('onkeydown', e => {
+input.addEventListener('onkeydown', e => {
     if (e.keyCode === 17) {
         input.className = 'showing';
         output.className = 'hiding';
